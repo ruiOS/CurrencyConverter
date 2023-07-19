@@ -1,0 +1,12 @@
+/*
+  Localizable.strings
+  CurrencyConverter
+
+  Created by Rupeshkumar on 03/07/23.
+  
+*/
+
+"CURRENCY_CONVERTER_TITLE" = "Currency Converter";
+"RETRY" = "Retry";
+"NETWORK_CONNECTION_ERROR" = "Please connect to network and try again";
+"SEARCH_CURRENCIES" = "Search Currencies";
