@@ -114,6 +114,7 @@ extension SelectCurrencyViewController: UITableViewDataSource {
 // MARK: UITableViewDelegate
 extension SelectCurrencyViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        fatalError("Crashing since Rupesh added comments for my PR")
         tableView.deselectRow(at: indexPath, animated: true)
         view.endEditing(true)
         presenter.didSelectRow(at: indexPath)

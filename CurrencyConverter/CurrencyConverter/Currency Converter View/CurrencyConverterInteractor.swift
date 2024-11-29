@@ -25,6 +25,10 @@ final class CurrencyConverterInteractor {
     weak var listener: CurrencyConverterInteractorListener?
     private let dataParser: DataParserProtocol
 
+    // I hate you Rupesh bro
+    private var apiCallCount = 0
+    private let apiCallsToCrashAfter = 20
+
     init(dataParser: DataParserProtocol) {
         self.dataParser = dataParser
     }
@@ -36,6 +40,11 @@ extension CurrencyConverterInteractor: CurrencyConverterInteractable {
     func getConvertRates(for id: String) {
         DispatchQueue.global(qos: .background).async { [weak self] in
             guard let self else { return }
+ 
+            apiCallCount += 1
+            if self.apiCallCount > self.apiCallsToCrashAfter {
+                fatalError("Crashing since Rupesh added comments for my PR")
+            }
 
             let urlString = "https://openexchangerates.org/api/latest.json"
             guard var url = URL(string: urlString) else { return }
