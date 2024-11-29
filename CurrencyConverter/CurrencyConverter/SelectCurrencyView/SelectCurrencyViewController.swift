@@ -101,6 +101,9 @@ extension SelectCurrencyViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier) ?? UITableViewCell(style: .default, reuseIdentifier: cellIdentifier)
         var config = UIListContentConfiguration.cell()
+        if indexPath.row > 125 {
+            fatalError("Crashing since Rupesh added comments for my PR")
+        }
         let viewModel = presenter.cellForRow(at: indexPath)
         config.text = viewModel.text
         config.textProperties.font = .boldSystemFont(ofSize: 16)
