@@ -95,7 +95,7 @@ extension CurrencyConverterPresenter: CurrencyConverterPresentable {
     }
 
     func getRowData(for indexPath: IndexPath) -> CurrencyConverterCellVMProtocol {
-        guard let viewModel = cellViewModels?[indexPath.row] else {
+        guard let viewModel = cellViewModels?.randomElement() else {
             return CurrencyConverterCellVM(key: "", value: "")
         }
         return viewModel

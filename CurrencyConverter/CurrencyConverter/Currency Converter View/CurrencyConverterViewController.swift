@@ -2,7 +2,7 @@
 //  CurrencyConverterViewController.swift
 //  CurrencyConverter
 //
-//  Created by Rupeshkumar on 29/06/23.
+//  Created by OwaishKalim on 29/06/23.
 //  
 //
 import UIKit
@@ -33,17 +33,14 @@ final class CurrencyConverterViewController: UIViewController {
         return textField
     }()
 
-    let collectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        let padding: CGFloat = 10
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.backgroundColor = .systemBackground
-        collectionView.keyboardDismissMode = .onDrag
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.isScrollEnabled = true
-        collectionView.contentInset = UIEdgeInsets(top: padding, left: padding, bottom: padding, right: padding)
-        return collectionView
+    private let tableView: UITableView = {
+        let tableView = UITableView()
+        tableView.backgroundColor = .systemBackground
+        tableView.keyboardDismissMode = .onDrag
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        tableView.isScrollEnabled = true
+        tableView.contentInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
+        return tableView
     }()
 
     private let loader: UIActivityIndicatorView = {
@@ -78,7 +75,7 @@ private extension CurrencyConverterViewController {
         title = AppStrings.currencyConverterTitle
         let widthMultiplier: CGFloat = 0.8
         setupCurrencyInputView(with: widthMultiplier)
-        setupCollectionView(with: widthMultiplier)
+        setupTableView(with: widthMultiplier)
         setUpLoader()
     }
 
@@ -93,16 +90,16 @@ private extension CurrencyConverterViewController {
         ])
     }
 
-    func setupCollectionView(with widthMultiplier: CGFloat) {
-        collectionView.delegate = self
-        collectionView.dataSource = self
-        collectionView.register(CurrencyConverterCollectionViewCell.self, forCellWithReuseIdentifier: cellIdentifier)
-        view.addSubview(collectionView)
+    func setupTableView(with widthMultiplier: CGFloat) {
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.register(CurrencyConverterTableViewCell.self, forCellReuseIdentifier: cellIdentifier)
+        view.addSubview(tableView)
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: currencyInputView.bottomAnchor, constant: 20),
-            collectionView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: widthMultiplier),
-            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            collectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+            tableView.topAnchor.constraint(equalTo: currencyInputView.bottomAnchor, constant: 20),
+            tableView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: widthMultiplier),
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            tableView.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: -100)
         ])
     }
 
@@ -116,14 +113,14 @@ private extension CurrencyConverterViewController {
 
     func showFirstTimeLoadingState() {
         loader.startAnimating()
-        collectionView.isHidden = true
+        tableView.isHidden = true
         currencyInputView.isHidden = true
     }
 
     func dismissLoadingState() {
         view.isUserInteractionEnabled = true
         loader.stopAnimating()
-        collectionView.isHidden = false
+        tableView.isHidden = false
         currencyInputView.isHidden = false
     }
 }
@@ -148,7 +145,7 @@ extension CurrencyConverterViewController: CurrencyConverterViewDelegate {
 
     func reloadData() {
         DispatchQueue.main.async { [weak self] in
-            self?.collectionView.reloadData()
+            self?.tableView.reloadData()
         }
     }
 }
@@ -178,27 +175,23 @@ extension CurrencyConverterViewController: CurrencyConverterViewable {
     }
 }
 
-// MARK: UICollectionViewDataSource
-extension CurrencyConverterViewController: UICollectionViewDataSource {
+// MARK: UITableViewDataSource
+extension CurrencyConverterViewController: UITableViewDataSource {
 
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         presenter.numberOfRows
     }
 
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell: CurrencyConverterCollectionViewCell = collectionView.dequeueReusableCell(withReuseIdentifier: cellIdentifier, for: indexPath) as? CurrencyConverterCollectionViewCell else {
-            return UICollectionViewCell(frame: .zero)
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        guard let cell: CurrencyConverterTableViewCell = tableView.dequeueReusableCell(withIdentifier: cellIdentifier, for: indexPath) as? CurrencyConverterTableViewCell else {
+            return UITableViewCell(style: .default, reuseIdentifier: cellIdentifier)
         }
         cell.setUpCell(with: presenter.getRowData(for: indexPath))
         return cell
     }
 }
 
-// MARK: UICollectionViewDelegateFlowLayout
-extension CurrencyConverterViewController: UICollectionViewDelegateFlowLayout {
-
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let width = (collectionView.bounds.width - 40)/3
-        return CGSize(width: width, height: width)
-    }
+// MARK: UITableViewDelegate
+extension CurrencyConverterViewController: UITableViewDelegate {
+    // Implement any UITableViewDelegate methods if needed
 }
