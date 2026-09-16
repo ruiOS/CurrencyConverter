@@ -1,0 +1,488 @@
+# ============================================================
+# WORKFLOW NAME
+# ============================================================
+
+# The name displayed in the GitHub Actions UI.
+name: Test another Workflow
+
+
+# ============================================================
+# RUN NAME
+# ============================================================
+
+# Controls the name displayed for an individual workflow run.
+#
+# Example:
+#   Checking test run
+#
+# You can also use expressions here.
+# Example:
+# run-name: Test ${{ inputs.test_suite }}
+run-name: Checking test run again
+description: This workflow demonstrates all workflow_dispatch input types.
+
+# ============================================================
+# TRIGGER
+# ============================================================
+
+# Defines WHEN this workflow can start.
+#
+# workflow_dispatch means:
+# "Allow this workflow to be manually started from GitHub."
+on:
+  workflow_dispatch:
+
+    # ========================================================
+    # WORKFLOW INPUTS
+    # ========================================================
+
+    # Inputs are values that the person starting the workflow
+    # can provide through the GitHub Actions UI.
+    inputs:
+
+
+      # ========================================================
+      # STRING INPUT
+      # ========================================================
+
+      test_suite:
+
+        # Text shown to the user in the "Run workflow" UI.
+        description: "Specify the test suite to run"
+
+        # true = user must provide/select a value.
+        # false = value is optional.
+        required: true
+
+        # Value used when the user doesn't change the input.
+        default: "all"
+
+        # Input data type.
+        type: string
+
+
+      # ========================================================
+      # CHOICE INPUT
+      # ========================================================
+
+      test_type:
+
+        # Text displayed in GitHub UI.
+        description: "Select the type of test to run"
+
+        # User must select something.
+        required: true
+
+        # Initially selected option.
+        default: "unit"
+
+        # Creates a dropdown.
+        type: choice
+
+        # Values available in the dropdown.
+        options:
+          - unit
+          - integration
+          - ui
+          - performance
+
+
+      # ========================================================
+      # BOOLEAN INPUT
+      # ========================================================
+
+      run_tests:
+
+        # Text displayed in GitHub UI.
+        description: "Should tests be executed?"
+
+        # User must provide a value.
+        required: true
+
+        # Default value is true.
+        default: true
+
+        # Creates a true/false input.
+        type: boolean
+
+
+      # ========================================================
+
+      # ========================================================
+      # NUMBER INPUT
+      # ========================================================
+
+      retry_count:
+
+        # Text displayed in GitHub UI.
+        description: "Number of times tests should be retried"
+
+        # User doesn't have to provide this.
+        required: false
+
+        # Default retry count.
+        default: "3"
+
+        # Numeric input.
+        type: number
+
+
+      # ========================================================
+      # OPTIONAL STRING
+      # ========================================================
+
+      test_filter:
+
+        # Text displayed in GitHub UI.
+        description: "Optional pytest filter"
+
+        # User can leave it empty.
+        required: false
+
+        # Empty string by default.
+        default: ""
+
+        # Free-form text.
+        type: string
+
+
+      # ========================================================
+      # CHOICE INPUT
+      # ========================================================
+
+      log_level:
+
+        description: "Select logging level"
+
+        required: true
+
+        default: "info"
+
+        # Dropdown.
+        type: choice
+
+        # Available dropdown values.
+        options:
+          - debug
+          - info
+          - warning
+          - error
+
+
+      # ========================================================
+      # OPTIONAL BOOLEAN
+      # ========================================================
+
+      generate_report:
+
+        description: "Generate a test report?"
+
+        # User doesn't have to change it.
+        required: false
+
+        # Default is false.
+        default: false
+
+        # Checkbox / boolean input.
+        type: boolean
+
+
+# ============================================================
+# JOBS
+# ============================================================
+
+# A workflow contains one or more jobs.
+jobs:
+
+  # ==========================================================
+  # JOB ID
+  # ==========================================================
+
+  # "run-tests" is the ID of this job.
+  #
+  # You choose this name yourself.
+  run-tests:
+
+    # ========================================================
+    # RUNNER
+    # ========================================================
+
+    # Tells GitHub which machine/runner should execute the job.
+    #
+    # ubuntu-latest means:
+    # Use the latest GitHub-hosted Ubuntu runner.
+    runs-on: ubuntu-latest
+
+
+    # ========================================================
+    # STEPS
+    # ========================================================
+
+    # A job consists of multiple steps.
+    steps:
+
+
+      # ======================================================
+      # STEP 1
+      # ======================================================
+
+      - name: Display inputs
+
+        # "run" executes shell commands on the runner.
+        run: |
+
+          echo "======================================"
+          echo "Workflow Inputs"
+          echo "======================================"
+
+
+          # ==================================================
+          # GITHUB ACTIONS INPUT CONTEXT
+          # ==================================================
+
+          # ${{ inputs.test_suite }}
+          #
+          # This is NOT a shell variable.
+          #
+          # It is a GitHub Actions expression.
+          #
+          # "inputs" is a GitHub Actions context.
+          # "test_suite" is the input you defined above.
+
+          echo "Test Suite      : ${{ inputs.test_suite }}"
+          echo "Test Type       : ${{ inputs.test_type }}"
+          echo "Run Tests       : ${{ inputs.run_tests }}"
+          echo "Environment     : ${{ inputs.environment }}"
+          echo "Retry Count     : ${{ inputs.retry_count }}"
+          echo "Test Filter     : ${{ inputs.test_filter }}"
+          echo "Log Level       : ${{ inputs.log_level }}"
+          echo "Generate Report : ${{ inputs.generate_report }}"
+
+
+      # ======================================================
+      # STEP 2
+      # ======================================================
+
+      - name: Checkout code
+
+        # "uses" means:
+        # Execute a pre-built GitHub Action.
+        #
+        # actions/checkout is an official GitHub Action that
+        # downloads/checks out your repository onto the runner.
+        #
+        # @v4 means use version 4.
+        uses: actions/checkout@v4
+
+
+      # ======================================================
+      # STEP 3
+      # ======================================================
+
+      - name: Set up Python
+
+        # Official GitHub Action for installing/configuring
+        # Python on the runner.
+        uses: actions/setup-python@v6
+
+        # Parameters passed to the action.
+        with:
+
+          # Python version to install.
+          python-version: "3.8"
+
+
+      # ======================================================
+      # STEP 4
+      # ======================================================
+
+      - name: Install dependencies
+
+        # Execute shell commands.
+        run: |
+
+          # Upgrade pip.
+          python -m pip install --upgrade pip
+
+          # Install packages from requirements.txt.
+          pip install -r requirements.txt
+
+
+      # ======================================================
+      # STEP 5
+      # ======================================================
+
+      - name: Run tests
+
+        # "if" controls whether this step should execute.
+        #
+        # inputs.run_tests is the boolean input defined above.
+        #
+        # If the user selected true:
+        #
+        #     run this step
+        #
+        # If false:
+        #
+        #     skip this step.
+        if: ${{ inputs.run_tests }}
+
+        run: |
+
+          # This part is NOT GitHub Actions syntax.
+          #
+          # This is Bash shell syntax.
+          if [ "${{ inputs.test_suite }}" == "all" ]; then
+
+            # Run all tests.
+            pytest tests/
+
+          else
+
+            # Run a particular test suite.
+            pytest tests/${{ inputs.test_suite }}
+
+          fi
+  # You choose this name yourself.
+  run-tests-again:
+
+    # ========================================================
+    # RUNNER
+    # ========================================================
+
+    # Tells GitHub which machine/runner should execute the job.
+    #
+    # ubuntu-latest means:
+    # Use the latest GitHub-hosted Ubuntu runner.
+    runs-on: ubuntu-latest
+
+
+    # ========================================================
+    # STEPS
+    # ========================================================
+
+    # A job consists of multiple steps.
+    steps:
+
+
+      # ======================================================
+      # STEP 1
+      # ======================================================
+
+      - name: Display inputs
+
+        # "run" executes shell commands on the runner.
+        run: |
+
+          echo "======================================"
+          echo "Workflow Inputs"
+          echo "======================================"
+
+
+          # ==================================================
+          # GITHUB ACTIONS INPUT CONTEXT
+          # ==================================================
+
+          # ${{ inputs.test_suite }}
+          #
+          # This is NOT a shell variable.
+          #
+          # It is a GitHub Actions expression.
+          #
+          # "inputs" is a GitHub Actions context.
+          # "test_suite" is the input you defined above.
+
+          echo "Test Suite      : ${{ inputs.test_suite }}"
+          echo "Test Type       : ${{ inputs.test_type }}"
+          echo "Run Tests       : ${{ inputs.run_tests }}"
+          echo "Environment     : ${{ inputs.environment }}"
+          echo "Retry Count     : ${{ inputs.retry_count }}"
+          echo "Test Filter     : ${{ inputs.test_filter }}"
+          echo "Log Level       : ${{ inputs.log_level }}"
+          echo "Generate Report : ${{ inputs.generate_report }}"
+
+
+      # ======================================================
+      # STEP 2
+      # ======================================================
+
+      - name: Checkout code
+
+        # "uses" means:
+        # Execute a pre-built GitHub Action.
+        #
+        # actions/checkout is an official GitHub Action that
+        # downloads/checks out your repository onto the runner.
+        #
+        # @v4 means use version 4.
+        uses: actions/checkout@v4
+
+
+      # ======================================================
+      # STEP 3
+      # ======================================================
+
+      - name: Set up Python
+
+        # Official GitHub Action for installing/configuring
+        # Python on the runner.
+        uses: actions/setup-python@v6
+
+        # Parameters passed to the action.
+        with:
+
+          # Python version to install.
+          python-version: "3.8"
+
+
+      # ======================================================
+      # STEP 4
+      # ======================================================
+
+      - name: Install dependencies
+
+        # Execute shell commands.
+        run: |
+
+          # Upgrade pip.
+          python -m pip install --upgrade pip
+
+          # Install packages from requirements.txt.
+          pip install -r requirements.txt
+
+
+      # ======================================================
+      # STEP 5
+      # ======================================================
+
+      - name: Run tests
+
+        # "if" controls whether this step should execute.
+        #
+        # inputs.run_tests is the boolean input defined above.
+        #
+        # If the user selected true:
+        #
+        #     run this step
+        #
+        # If false:
+        #
+        #     skip this step.
+        if: ${{ inputs.run_tests }}
+
+        run: |
+
+          # This part is NOT GitHub Actions syntax.
+          #
+          # This is Bash shell syntax.
+          if [ "${{ inputs.test_suite }}" == "all" ]; then
+
+            # Run all tests.
+            pytest tests/
+
+          else
+
+            # Run a particular test suite.
+            pytest tests/${{ inputs.test_suite }}
+
+          fi
